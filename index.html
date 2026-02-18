@@ -1,0 +1,236 @@
+<!--
+  social-cards.html — улучшено пати:
+  - Цветной пати теперь ярко переливается (normal blend, быстрее).
+  - Чёрно-белый пати — медленно переливается и менее яркий.
+  - Значок Discord заменён на альтернативный (chat-bubble) — можно поменять на любой SVG в icons.discord.
+  Редактирование: замените avatar.jpg и ссылки внизу скрипта (dcChannelBtn, tgGroupBtn, tgChannelBtn).
+-->
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Мои соцсети — пати</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#000;--card:#050505;--muted:#9aa4b2;--accent1:#7c3aed;--accent2:#06b6d4}
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:var(--bg);color:#e9eef8;display:flex;align-items:center;justify-content:center;padding:32px;overflow:hidden}
+
+    /* PARTY BACKGROUND */
+    .party-bg{position:fixed;inset:0;z-index:0;opacity:0;pointer-events:none;transition:opacity .4s ease}
+    .party-bg.active{opacity:1}
+    .party-bg .g{position:absolute;inset:0;background-size:600% 600%;animation:gradientShift 18s linear infinite;filter:blur(40px);transition:filter .4s ease,opacity .4s ease,animation-duration .2s linear}
+
+    /* color (яркий) — нормальное смешивание, ярче, быстрее */
+    .party-bg .g.color{background:linear-gradient(270deg,#ff4d6d,#7c3aed,#06b6d4,#ffd86b);mix-blend-mode:normal;filter:blur(56px) saturate(170%);opacity:1;animation-duration:12s}
+    /* bw (чёрно-белый) — менее яркий, медленнее, мягкий */
+    .party-bg .g.bw{background:linear-gradient(270deg,#0b0b0b,#444444,#ffffff,#bfbfbf);mix-blend-mode:screen;filter:blur(36px) saturate(75%);opacity:0.45;animation-duration:34s}
+
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    .wrap{position:relative;z-index:5;width:100%;max-width:960px}
+
+    /* CARD (blurred, semitransparent window) */
+    .card-shell{background:rgba(6,6,6,0.28);border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(10px) saturate(120%);box-shadow:0 20px 60px rgba(2,6,23,0.6)}
+    .header{display:flex;gap:16px;align-items:center}
+    .avatar{width:92px;height:92px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);background:#0a0a0a}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .info{flex:1}
+    .name{font-weight:800;margin:0;font-size:20px}
+    .bio{color:var(--muted);margin-top:6px;font-size:13px}
+
+    .controls{display:flex;gap:8px;align-items:center;margin-left:auto}
+    .party-toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer}
+
+    .grid{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+
+    /* link cards */
+    .link-card{position:relative;display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);cursor:pointer;text-decoration:none;color:inherit;overflow:hidden;transition:transform .18s ease}
+    .link-card:hover{transform:translateY(-8px)}
+    .link-card .icon{width:48px;height:48px;border-radius:10px;background:#070707;display:flex;align-items:center;justify-content:center}
+    .link-card .title{font-weight:700}
+    .link-card .sub{font-size:13px;color:var(--muted)}
+    .link-card .right{margin-left:auto;font-size:12px;color:var(--muted)}
+
+    /* shimmer outline */
+    .link-card::before, .btn::before, .btn-ghost::before, .btn-white::before{content:"";position:absolute;inset:0;border-radius:12px;padding:2px;pointer-events:none;opacity:0;transition:opacity .18s ease}
+    .link-card::after, .btn::after, .btn-ghost::after, .btn-white::after{content:"";position:absolute;left:-120%;top:-60%;width:340%;height:220%;background:linear-gradient(90deg,transparent 0%, rgba(255,255,255,0.95) 45%, rgba(255,255,255,0.95) 55%, transparent 100%);transform:translateX(0) rotate(12deg);opacity:0;mix-blend-mode:screen;filter:blur(6px);transition:transform .7s cubic-bezier(.2,.9,.2,1),opacity .25s ease;pointer-events:none}
+    .link-card:hover::before{opacity:1;background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));box-shadow:0 0 0 1px rgba(255,255,255,0.06) inset}
+    .link-card:hover::after{transform:translateX(120%) rotate(12deg);opacity:1}
+
+    /* Buttons */
+    .btn, .btn-ghost, .btn-white{position:relative;overflow:hidden;border-radius:10px;padding:9px 14px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+    .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#000}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .btn-white{background:#ffffff;color:#000;border:1px solid rgba(255,255,255,0.06)}
+
+    .btn::before, .btn-ghost::before, .btn-white::before{border-radius:10px}
+    .btn::after, .btn-ghost::after, .btn-white::after{border-radius:10px}
+    .btn:hover::before, .btn-ghost:hover::before, .btn-white:hover::before{opacity:1;background:linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));box-shadow:0 0 0 1px rgba(255,255,255,0.08) inset}
+    .btn:hover::after, .btn-ghost:hover::after, .btn-white:hover::after{transform:translateX(120%) rotate(12deg);opacity:1}
+
+    /* separator */
+    .sep{display:flex;align-items:center;gap:12px;margin:18px 0}
+    .sep-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);border-radius:2px}
+    .sep-text{color:var(--muted);font-size:13px}
+
+    .row-buttons{display:flex;gap:10px;flex-wrap:wrap}
+
+    /* modal */
+    .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:40}
+    .modal{background:rgba(6,6,6,0.36);border-radius:12px;padding:18px;max-width:420px;width:92%;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(8px)}
+    .modal h3{margin:0 0 8px 0}
+    .modal p{margin:0 0 12px 0;color:var(--muted)}
+
+    @media (max-width:520px){.avatar{width:64px;height:64px;border-radius:12px}.link-card{padding:10px}}
+  </style>
+</head>
+<body>
+  <div class="party-bg" id="partyBg" aria-hidden>
+    <div class="g bw" id="partyG"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="card-shell">
+      <div class="header">
+        <div class="avatar"><img id="avatarImg" src="avatar.jpg" alt="Аватар"></div>
+        <div class="info">
+          <h1 class="name" id="displayName">waveliy</h1>
+          <div class="bio" id="displayBio">hiiii.</div>
+        </div>
+
+        <div class="controls">
+          <button class="party-toggle" id="partyBtn" onclick="toggleParty()">Пати: Вкл</button>
+          <button class="party-toggle" id="colorBtn" onclick="togglePartyColor()">Обычный пати</button>
+        </div>
+      </div>
+
+      <div class="grid" id="linksGrid"></div>
+
+      <div class="sep">
+        <div class="sep-line"></div>
+        <div class="sep-text">---</div>
+        <div class="sep-line"></div>
+      </div>
+
+      <div class="row-buttons">
+        <a id="tgGroupBtn" class="btn-ghost" href="#" target="_blank" rel="noopener">Telegram группа</a>
+        <a id="tgChannelBtn" class="btn-ghost" href="#" target="_blank" rel="noopener">Telegram канал</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal для Discord -->
+  <div class="modal-back" id="modalBack">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3>Discord</h3>
+      <p>discord username: <strong id="dcUser">waveliy</strong></p>
+      <div style="display:flex;gap:8px">
+        <a id="dcChannelBtn" class="btn-white" href="#" target="_blank" rel="noopener">Discord channel</a>
+        <button class="btn-ghost" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const profile = {
+      name: "waveliy",
+      bio: "hiiii.",
+      avatar: "avatar.jpg",
+      links: [
+        { name: "Telegram", sub: "@wave_liy", url: "https://t.me/wave_liy", type: "telegram" },
+        { name: "YouTube", sub: "быстрый доступ к ютубу 😭", url: "https://youtube.com/", type: "youtube" },
+        { name: "Discord", sub: "waveliy", url: "#", type: "discord" }
+      ]
+    };
+
+    // init
+    document.getElementById('displayName').textContent = profile.name;
+    document.getElementById('displayBio').textContent = profile.bio;
+    document.getElementById('avatarImg').src = profile.avatar;
+
+    const icons = {
+      telegram: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 3L2 11.5L8 14L17 11L9 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+      youtube: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="1.3"/><path d="M10 9L16 12L10 15V9Z" fill="currentColor"/></svg>`,
+      // alternative chat-bubble icon instead of previous discord mark
+      discord: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    };
+
+    const grid = document.getElementById('linksGrid');
+    profile.links.forEach(l => {
+      const el = document.createElement(l.type === 'discord' ? 'div' : 'a');
+      el.className = 'link-card';
+      if(l.type !== 'discord'){
+        el.href = l.url; el.target = '_blank'; el.rel = 'noopener noreferrer';
+      } else {
+        el.setAttribute('role','button');
+        el.addEventListener('click', openDiscordModal);
+      }
+      el.innerHTML = `
+        <div class="icon">${icons[l.type] || icons['telegram']}</div>
+        <div>
+          <div class="title">${l.name}</div>
+          <div class="sub">${l.sub}</div>
+        </div>
+        <div class="right">Открыть →</div>
+      `;
+      grid.appendChild(el);
+    });
+
+    // party state
+    const partyBg = document.getElementById('partyBg');
+    const partyG = document.getElementById('partyG');
+    const colorBtn = document.getElementById('colorBtn');
+    let partyOn = true; // включено по умолчанию
+    let partyColor = 'bw'; // 'bw' или 'color' — по умолчанию чёрно-белый
+
+    // apply initial state
+    partyBg.classList.add('active');
+    partyG.classList.remove('color','bw');
+    partyG.classList.add(partyColor);
+    colorBtn.textContent = (partyColor === 'bw') ? 'Обычный пати' : 'Мой пати';
+    document.getElementById('partyBtn').textContent = partyOn ? 'Пати: Вкл' : 'Пати: Выкл';
+
+    function toggleParty(){ partyOn = !partyOn; partyBg.classList.toggle('active', partyOn); document.getElementById('partyBtn').textContent = partyOn ? 'Пати: Вкл' : 'Пати: Выкл'; }
+
+    function togglePartyColor(){
+      partyColor = (partyColor === 'bw') ? 'color' : 'bw';
+      partyG.classList.remove('color','bw');
+      partyG.classList.add(partyColor);
+      colorBtn.textContent = (partyColor === 'bw') ? 'Обычный пати' : 'Мой пати';
+    }
+
+    // small random flicker when party on
+    setInterval(()=>{
+      if(!partyOn) return;
+      const cards = document.querySelectorAll('.link-card');
+      if(!cards.length) return;
+      const idx = Math.floor(Math.random()*cards.length);
+      const c = cards[idx];
+      c.style.transform = 'translateY(-10px) scale(1.02)';
+      c.style.boxShadow = (partyColor === 'bw') ? '0 12px 30px rgba(255,255,255,0.06)' : '0 12px 30px rgba(124,58,237,0.12)';
+      setTimeout(()=>{ c.style.transform=''; c.style.boxShadow=''; }, 250 + Math.random()*450);
+    }, 380);
+
+    // modal
+    function openDiscordModal(){
+      document.getElementById('dcUser').textContent = 'waveliy';
+      // ссылка на сервер дс:
+      document.getElementById('dcChannelBtn').href = 'https://discord.gg/N5ZPvEpqCe';
+      document.getElementById('modalBack').style.display = 'flex';
+    }
+    function closeModal(){document.getElementById('modalBack').style.display = 'none'}
+    document.getElementById('modalBack').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+    // тг ссылки:
+    document.getElementById('tgGroupBtn').href = 'https://t.me/+k1ZlAiUR26s3NWU8';
+    document.getElementById('tgChannelBtn').href = 'https://t.me/cheetakha';
+
+  </script>
+</body>
+</html>
