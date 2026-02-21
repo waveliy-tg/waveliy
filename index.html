@@ -1,10 +1,3 @@
-<!--
-  social-cards.html — улучшено пати:
-  - Цветной пати теперь ярко переливается (normal blend, быстрее).
-  - Чёрно-белый пати — медленно переливается и менее яркий.
-  - Значок Discord заменён на альтернативный (chat-bubble) — можно поменять на любой SVG в icons.discord.
-  Редактирование: замените avatar.jpg и ссылки внизу скрипта (dcChannelBtn, tgGroupBtn, tgChannelBtn).
--->
 <!doctype html>
 <html lang="ru">
 <head>
@@ -26,7 +19,7 @@
     .party-bg .g{position:absolute;inset:0;background-size:600% 600%;animation:gradientShift 18s linear infinite;filter:blur(40px);transition:filter .4s ease,opacity .4s ease,animation-duration .2s linear}
 
     /* color (яркий) — нормальное смешивание, ярче, быстрее */
-    .party-bg .g.color{background:linear-gradient(270deg,#ff4d6d,#7c3aed,#06b6d4,#ffd86b);mix-blend-mode:normal;filter:blur(56px) saturate(170%);opacity:1;animation-duration:12s}
+    .party-bg .g.color{background:linear-gradient(270deg,#ff4d6d,#7c3aed,#06b6d4,#ffd86b);mix-blend-mode:normal;filter:blur(56px) saturate(130%);opacity:1;animation-duration:12s}
     /* bw (чёрно-белый) — менее яркий, медленнее, мягкий */
     .party-bg .g.bw{background:linear-gradient(270deg,#0b0b0b,#444444,#ffffff,#bfbfbf);mix-blend-mode:screen;filter:blur(36px) saturate(75%);opacity:0.45;animation-duration:34s}
 
@@ -42,6 +35,7 @@
     .info{flex:1}
     .name{font-weight:800;margin:0;font-size:20px}
     .bio{color:var(--muted);margin-top:6px;font-size:13px}
+    .meta{color:var(--muted);font-size:13px;margin-top:6px}
 
     .controls{display:flex;gap:8px;align-items:center;margin-left:auto}
     .party-toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer}
@@ -49,7 +43,7 @@
     .grid{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 
     /* link cards */
-    .link-card{position:relative;display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);cursor:pointer;text-decoration:none;color:inherit;overflow:hidden;transition:transform .18s ease}
+    .link-card{position:relative;display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);cursor:pointer;text-decoration:none;color:inherit;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease}
     .link-card:hover{transform:translateY(-8px)}
     .link-card .icon{width:48px;height:48px;border-radius:10px;background:#070707;display:flex;align-items:center;justify-content:center}
     .link-card .title{font-weight:700}
@@ -82,9 +76,27 @@
 
     /* modal */
     .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:40}
-    .modal{background:rgba(6,6,6,0.36);border-radius:12px;padding:18px;max-width:420px;width:92%;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(8px)}
+    .modal{background:rgba(6,6,6,0.36);border-radius:12px;padding:18px;max-width:520px;width:92%;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(8px)}
     .modal h3{margin:0 0 8px 0}
     .modal p{margin:0 0 12px 0;color:var(--muted)}
+
+    /* small improvements */
+    .footer{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
+    .project{margin-top:12px;padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02)}
+
+    /* STATUS LIST (added) */
+    .status-list{list-style:none;padding:0;margin:8px 0 0 0;display:flex;flex-direction:column;gap:10px}
+    .status-item{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
+    .status-dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex:0 0 14px}
+    .status-dot.online{background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.18)} /* зеленый */
+    .status-dot.dnd{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.18)} /* красный */
+    .status-dot.offline{border:2px solid var(--muted);background:transparent} /* серый круг без заливки */
+    .status-dot.moon{display:inline-flex;align-items:center;justify-content:center;background:transparent} /* луна — вставим svg */
+    .status-item svg{width:12px;height:12px;display:block}
+
+    /* flicker animation used for small interactive pulse */
+    @keyframes pulseUp{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+    .flicker{animation:pulseUp .35s ease forwards}
 
     @media (max-width:520px){.avatar{width:64px;height:64px;border-radius:12px}.link-card{padding:10px}}
   </style>
@@ -101,12 +113,18 @@
         <div class="info">
           <h1 class="name" id="displayName">waveliy</h1>
           <div class="bio" id="displayBio">hiiii.</div>
+          <div class="meta" id="birthdayMeta">Дней до дня рождения: <strong id="daysToBday">—</strong></div>
         </div>
 
         <div class="controls">
-          <button class="party-toggle" id="partyBtn" onclick="toggleParty()">Пати: Вкл</button>
-          <button class="party-toggle" id="colorBtn" onclick="togglePartyColor()">Обычный пати</button>
+          <button class="party-toggle" id="partyBtn" onclick="toggleParty()">Пати: Выкл</button>
+          <button class="party-toggle" id="colorBtn" onclick="togglePartyColor()">Включить цветной</button>
+          <button class="party-toggle" id="infoBtn" onclick="openInfo()">Статусы в Discord</button>
         </div>
+      </div>
+
+      <div class="project" id="projectBlock">
+        <strong>Сейчас делаю:</strong> <span id="currentProject">ничего...</span>
       </div>
 
       <div class="grid" id="linksGrid"></div>
@@ -119,20 +137,40 @@
 
       <div class="row-buttons">
         <a id="tgGroupBtn" class="btn-ghost" href="#" target="_blank" rel="noopener">Telegram группа</a>
-        <a id="tgChannelBtn" class="btn-ghost" href="#" target="_blank" rel="noopener">Telegram канал(здесь рассписано гораздо больше обо мне)</a>
+        <a id="tgChannelBtn" class="btn-ghost" href="#" target="_blank" rel="noopener">Telegram канал</a>
       </div>
 
+      <div class="footer">© 2026 waveliy</div>
     </div>
   </div>
 
-  <!-- Modal для Discord -->
+  <!-- Modal для Discord и другой информации -->
   <div class="modal-back" id="modalBack">
     <div class="modal" role="dialog" aria-modal="true">
-      <h3>Discord</h3>
-      <p>discord username: <strong id="dcUser">waveliy</strong></p>
-      <div style="display:flex;gap:8px">
+      <h3 id="modalTitle">Discord</h3>
+      <p id="modalText">discord username: <strong id="dcUser">waveliy</strong></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
         <a id="dcChannelBtn" class="btn-white" href="#" target="_blank" rel="noopener">Discord channel</a>
         <button class="btn-ghost" onclick="closeModal()">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info modal (статусы) изменён: добавлены цветные кружки -->
+  <div class="modal-back" id="infoBack">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3>Discord статусы</h3>
+
+      <ul class="status-list">
+        <li class="status-item"><span class="status-dot online" aria-hidden></span><strong>В сети</strong>:я у компьютера и, скорее всего, отвечу быстро.</li>
+        <li class="status-item"><span class="status-dot dnd" aria-hidden></span><strong>Не беспокоить</strong>:я занят и не отвечаю, можешь написать, но отвечу не сразу.</li>
+        <li class="status-item"><span class="status-dot moon" aria-hidden><!-- луна SVG --><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#FACC15"/></svg></span><strong>Неактивен</strong>:я не у компьютера прямо сейчас, либо отошёл.</li>
+        <li class="status-item"><span class="status-dot offline" aria-hidden></span><strong>Не в сети</strong>:меня нет онлайн/отвечу позже.</li>
+      </ul>
+
+      <p style="color:var(--muted);font-size:13px;margin-top:8px">Хоть в телеграмме такого нет, ты просто напиши, а я позже отвечу.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" onclick="closeInfo()">Закрыть</button>
       </div>
     </div>
   </div>
@@ -142,10 +180,11 @@
       name: "waveliy",
       bio: "hiiii.",
       avatar: "avatar.jpg",
+      currentProject: "занимаюсь фигнёй, и кстати, я действительно меняю эту фигню, omgg",
       links: [
         { name: "Telegram", sub: "@wave_liy", url: "https://t.me/wave_liy", type: "telegram" },
         { name: "YouTube", sub: "быстрый доступ к ютубу 😭", url: "https://youtube.com/", type: "youtube" },
-        { name: "Discord", sub: "waveliy", url: "#", type: "discord" }
+        { name: "Discord", sub: "waveliy", url: "https://discord.gg/N5ZPvEpqCe", type: "discord" }
       ]
     };
 
@@ -153,6 +192,7 @@
     document.getElementById('displayName').textContent = profile.name;
     document.getElementById('displayBio').textContent = profile.bio;
     document.getElementById('avatarImg').src = profile.avatar;
+    document.getElementById('currentProject').textContent = profile.currentProject;
 
     const icons = {
       telegram: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 3L2 11.5L8 14L17 11L9 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
@@ -163,14 +203,19 @@
 
     const grid = document.getElementById('linksGrid');
     profile.links.forEach(l => {
-      const el = document.createElement(l.type === 'discord' ? 'div' : 'a');
-      el.className = 'link-card';
-      if(l.type !== 'discord'){
-        el.href = l.url; el.target = '_blank'; el.rel = 'noopener noreferrer';
+      // for accessibility, use <a> for external links, <button> for actions (discord opens modal)
+      let el;
+      if(l.type === 'discord'){
+        el = document.createElement('button');
+        el.className = 'link-card';
+        el.setAttribute('type','button');
+        el.addEventListener('click', () => openDiscordModal(l));
       } else {
-        el.setAttribute('role','button');
-        el.addEventListener('click', openDiscordModal);
+        el = document.createElement('a');
+        el.className = 'link-card';
+        el.href = l.url; el.target = '_blank'; el.rel = 'noopener noreferrer';
       }
+
       el.innerHTML = `
         <div class="icon">${icons[l.type] || icons['telegram']}</div>
         <div>
@@ -186,53 +231,91 @@
     const partyBg = document.getElementById('partyBg');
     const partyG = document.getElementById('partyG');
     const colorBtn = document.getElementById('colorBtn');
-    let partyOn = true; // включено по умолчанию
-    let partyColor = 'bw'; // 'bw' или 'color' — по умолчанию чёрно-белый
+    let partyOn = false; // выключено по умолчанию
+    let partyColor = 'bw'; // 'bw' или 'color'
 
     // apply initial state
-    partyBg.classList.add('active');
+    partyBg.classList.toggle('active', partyOn);
     partyG.classList.remove('color','bw');
     partyG.classList.add(partyColor);
-    colorBtn.textContent = (partyColor === 'bw') ? 'Обычный пати' : 'Мой пати';
+    colorBtn.textContent = (partyColor === 'bw') ? 'Включить цветной' : 'Включить ч/б';
     document.getElementById('partyBtn').textContent = partyOn ? 'Пати: Вкл' : 'Пати: Выкл';
 
-    function toggleParty(){ partyOn = !partyOn; partyBg.classList.toggle('active', partyOn); document.getElementById('partyBtn').textContent = partyOn ? 'Пати: Вкл' : 'Пати: Выкл'; }
+    function toggleParty(){
+      partyOn = !partyOn;
+      partyBg.classList.toggle('active', partyOn);
+      document.getElementById('partyBtn').textContent = partyOn ? 'Пати: Вкл' : 'Пати: Выкл';
+    }
 
     function togglePartyColor(){
       partyColor = (partyColor === 'bw') ? 'color' : 'bw';
       partyG.classList.remove('color','bw');
       partyG.classList.add(partyColor);
-      colorBtn.textContent = (partyColor === 'bw') ? 'Обычный пати' : 'Мой пати';
+      colorBtn.textContent = (partyColor === 'bw') ? 'Включить цветной' : 'Включить ч/б';
     }
 
-    // small random flicker when party on
+    // gentler random flicker: longer interval, add short CSS animation class then remove
     setInterval(()=>{
       if(!partyOn) return;
       const cards = document.querySelectorAll('.link-card');
       if(!cards.length) return;
       const idx = Math.floor(Math.random()*cards.length);
       const c = cards[idx];
-      c.style.transform = 'translateY(-10px) scale(1.02)';
+      c.classList.add('flicker');
+      // colored shadow only when color mode
       c.style.boxShadow = (partyColor === 'bw') ? '0 12px 30px rgba(255,255,255,0.06)' : '0 12px 30px rgba(124,58,237,0.12)';
-      setTimeout(()=>{ c.style.transform=''; c.style.boxShadow=''; }, 250 + Math.random()*450);
-    }, 380);
+      setTimeout(()=>{ c.classList.remove('flicker'); c.style.boxShadow=''; }, 450 + Math.random()*300);
+    }, 1500);
 
     // modal
-    function openDiscordModal(){
-      document.getElementById('dcUser').textContent = 'waveliy';
-      // ссылка на сервер дс:
-      document.getElementById('dcChannelBtn').href = 'https://discord.gg/N5ZPvEpqCe';
+    function openDiscordModal(link){
+      document.getElementById('modalTitle').textContent = 'Discord';
+      document.getElementById('dcUser').textContent = link.sub || 'discord';
+      document.getElementById('dcChannelBtn').href = link.url || '#';
+      document.getElementById('modalText').innerHTML = `discord username: <strong>${link.sub}</strong>`;
       document.getElementById('modalBack').style.display = 'flex';
     }
     function closeModal(){document.getElementById('modalBack').style.display = 'none'}
     document.getElementById('modalBack').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
 
+    // info modal (statuses)
+    function openInfo(){ document.getElementById('infoBack').style.display = 'flex'; }
+    function closeInfo(){ document.getElementById('infoBack').style.display = 'none'; }
+    document.getElementById('infoBack').addEventListener('click', function(e){ if(e.target===this) closeInfo(); });
+
+    // close modals with ESC
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape'){
+        closeModal(); closeInfo();
+      }
+    });
+
     // тг ссылки:
     document.getElementById('tgGroupBtn').href = 'https://t.me/+k1ZlAiUR26s3NWU8';
     document.getElementById('tgChannelBtn').href = 'https://t.me/cheetakha';
 
+    // --- countdown to birthday (22 July) ---
+    function daysToBirthday(month = 7, day = 22){
+      const now = new Date();
+      const year = now.getFullYear();
+      let b = new Date(year, month - 1, day);
+      if(b < now){ b = new Date(year + 1, month - 1, day); }
+      const diff = b - now;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+    function updateBday(){
+      const days = daysToBirthday(7,22);
+      document.getElementById('daysToBday').textContent = days;
+    }
+    updateBday();
+    // обновлять раз в день
+    setInterval(updateBday, 1000*60*60*6);
+
+    // small improvement: accessibility focus outline when keyboard nav used
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Tab') document.body.classList.add('user-is-tabbing');
+    });
+
   </script>
 </body>
 </html>
-
-
