@@ -8,29 +8,60 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#000;--card:#050505;--muted:#9aa4b2;--accent1:#7c3aed;--accent2:#06b6d4}
+    :root{
+      --bg:#0b1020;
+      --glass-bg: rgba(255,255,255,0.04);
+      --glass-strong: rgba(255,255,255,0.06);
+      --muted:#9aa4b2;
+      --accent1:#7c3aed;
+      --accent2:#06b6d4;
+      --border: rgba(255,255,255,0.08);
+      --card-elev: 0 10px 30px rgba(2,6,23,0.6);
+    }
     *{box-sizing:border-box}
-    html,body{height:100%;}
-    body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:var(--bg);color:#e9eef8;display:flex;align-items:center;justify-content:center;padding:32px;overflow:hidden}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#05060a 0%, #0b1020 100%);
+      color:#e9eef8;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      overflow:hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      /* subtle frosted overlay to give more glass feel behind whole page */
+      background-attachment: fixed;
+    }
 
     /* PARTY BACKGROUND */
     .party-bg{position:fixed;inset:0;z-index:0;opacity:0;pointer-events:none;transition:opacity .4s ease}
     .party-bg.active{opacity:1}
     .party-bg .g{position:absolute;inset:0;background-size:600% 600%;animation:gradientShift 18s linear infinite;filter:blur(40px);transition:filter .4s ease,opacity .4s ease,animation-duration .2s linear}
 
-    /* color (яркий) — нормальное смешивание, ярче, быстрее */
     .party-bg .g.color{background:linear-gradient(270deg,#ff4d6d,#7c3aed,#06b6d4,#ffd86b);mix-blend-mode:normal;filter:blur(56px) saturate(130%);opacity:1;animation-duration:12s}
-    /* bw (чёрно-белый) — менее яркий, медленнее, мягкий */
     .party-bg .g.bw{background:linear-gradient(270deg,#0b0b0b,#444444,#ffffff,#bfbfbf);mix-blend-mode:screen;filter:blur(36px) saturate(75%);opacity:0.45;animation-duration:34s}
 
     @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
-    .wrap{position:relative;z-index:5;width:100%;max-width:960px}
+    .wrap{position:relative;z-index:5;width:100%;max-width:960px;padding:8px}
 
-    /* CARD (blurred, semitransparent window) */
-    .card-shell{background:rgba(6,6,6,0.28);border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(10px) saturate(120%);box-shadow:0 20px 60px rgba(2,6,23,0.6)}
+    /* GLASS: общие правила для стеклянных панелей */
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      box-shadow: var(--card-elev);
+    }
+
+    /* CARD (glass) */
+    .card-shell{padding:22px;border-radius:16px}
     .header{display:flex;gap:16px;align-items:center}
-    .avatar{width:92px;height:92px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);background:#0a0a0a}
+    .avatar{width:92px;height:92px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))}
     .avatar img{width:100%;height:100%;object-fit:cover;display:block}
     .info{flex:1}
     .name{font-weight:800;margin:0;font-size:20px}
@@ -38,14 +69,21 @@
     .meta{color:var(--muted);font-size:13px;margin-top:6px}
 
     .controls{display:flex;gap:8px;align-items:center;margin-left:auto}
-    .party-toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer}
+    .party-toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer;backdrop-filter:blur(6px)}
 
     .grid{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 
-    /* link cards */
-    .link-card{position:relative;display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);cursor:pointer;text-decoration:none;color:inherit;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease}
-    .link-card:hover{transform:translateY(-8px)}
-    .link-card .icon{width:48px;height:48px;border-radius:10px;background:#070707;display:flex;align-items:center;justify-content:center}
+    /* link cards — glass too */
+    .link-card{
+      position:relative;display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      cursor:pointer;text-decoration:none;color:inherit;overflow:hidden;
+      transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+      backdrop-filter: blur(8px) saturate(110%);
+    }
+    .link-card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(2,6,23,0.55)}
+    .link-card .icon{width:48px;height:48px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));display:flex;align-items:center;justify-content:center}
     .link-card .title{font-weight:700}
     .link-card .sub{font-size:13px;color:var(--muted)}
     .link-card .right{margin-left:auto;font-size:12px;color:var(--muted)}
@@ -56,11 +94,11 @@
     .link-card:hover::before{opacity:1;background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));box-shadow:0 0 0 1px rgba(255,255,255,0.06) inset}
     .link-card:hover::after{transform:translateX(120%) rotate(12deg);opacity:1}
 
-    /* Buttons */
+    /* Buttons (glass + accent) */
     .btn, .btn-ghost, .btn-white{position:relative;overflow:hidden;border-radius:10px;padding:9px 14px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
-    .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#000}
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-    .btn-white{background:#ffffff;color:#000;border:1px solid rgba(255,255,255,0.06)}
+    .btn{background: linear-gradient(90deg, rgba(124,58,237,0.14), rgba(6,182,212,0.12)); color:#eaf6ff; border:1px solid rgba(255,255,255,0.06); backdrop-filter: blur(6px)}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);backdrop-filter: blur(6px)}
+    .btn-white{background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255,255,255,0.03)); color:#ffffff; border:1px solid rgba(255,255,255,0.08);}
 
     .btn::before, .btn-ghost::before, .btn-white::before{border-radius:10px}
     .btn::after, .btn-ghost::after, .btn-white::after{border-radius:10px}
@@ -74,27 +112,26 @@
 
     .row-buttons{display:flex;gap:10px;flex-wrap:wrap}
 
-    /* modal */
+    /* modal (glass) */
     .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:40}
-    .modal{background:rgba(6,6,6,0.36);border-radius:12px;padding:18px;max-width:520px;width:92%;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(8px)}
+    .modal{border-radius:12px;padding:18px;max-width:520px;width:92%;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(12px) saturate(120%);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 30px 60px rgba(2,6,23,0.65)}
     .modal h3{margin:0 0 8px 0}
     .modal p{margin:0 0 12px 0;color:var(--muted)}
 
     /* small improvements */
     .footer{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
-    .project{margin-top:12px;padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02)}
+    .project{margin-top:12px;padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(6px)}
 
-    /* STATUS LIST (added) */
+    /* STATUS LIST */
     .status-list{list-style:none;padding:0;margin:8px 0 0 0;display:flex;flex-direction:column;gap:10px}
     .status-item{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
     .status-dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex:0 0 14px}
-    .status-dot.online{background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.18)} /* зеленый */
-    .status-dot.dnd{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.18)} /* красный */
-    .status-dot.offline{border:2px solid var(--muted);background:transparent} /* серый круг без заливки */
-    .status-dot.moon{display:inline-flex;align-items:center;justify-content:center;background:transparent} /* луна — вставим svg */
+    .status-dot.online{background:#34D399;box-shadow:0 0 8px rgba(52,211,153,0.18)}
+    .status-dot.dnd{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.18)}
+    .status-dot.offline{border:2px solid var(--muted);background:transparent}
+    .status-dot.moon{display:inline-flex;align-items:center;justify-content:center;background:transparent}
     .status-item svg{width:12px;height:12px;display:block}
 
-    /* flicker animation used for small interactive pulse */
     @keyframes pulseUp{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
     .flicker{animation:pulseUp .35s ease forwards}
 
@@ -107,7 +144,7 @@
   </div>
 
   <div class="wrap">
-    <div class="card-shell">
+    <div class="card-shell glass">
       <div class="header">
         <div class="avatar"><img id="avatarImg" src="avatar.jpg" alt="Аватар"></div>
         <div class="info">
@@ -123,7 +160,7 @@
         </div>
       </div>
 
-      <div class="project" id="projectBlock">
+      <div class="project glass" id="projectBlock">
         <strong>Сейчас делаю:</strong> <span id="currentProject">ничего...</span>
       </div>
 
@@ -138,6 +175,8 @@
       <div class="row-buttons">
         <a id="tgGroupBtn" class="btn-ghost" href="#" target="_blank" rel="noopener">Telegram группа</a>
         <a id="tgChannelBtn" class="btn-ghost" href="#" target="_blank" rel="noopener">Telegram канал</a>
+        <!-- Новая кнопка: Обходы ограничений (пустая ссылка) -->
+        <a id="bypassBtn" class="btn" href="#" rel="noopener" aria-label="Обходы ограничений">Обходы ограничений</a>
       </div>
 
       <div class="footer">© 2026 waveliy</div>
@@ -146,7 +185,7 @@
 
   <!-- Modal для Discord и другой информации -->
   <div class="modal-back" id="modalBack">
-    <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal glass" role="dialog" aria-modal="true">
       <h3 id="modalTitle">Discord</h3>
       <p id="modalText">discord username: <strong id="dcUser">waveliy</strong></p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -156,9 +195,9 @@
     </div>
   </div>
 
-  <!-- Info modal (статусы) изменён: добавлены цветные кружки -->
+  <!-- Info modal (статусы) -->
   <div class="modal-back" id="infoBack">
-    <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal glass" role="dialog" aria-modal="true">
       <h3>Discord статусы</h3>
 
       <ul class="status-list">
@@ -197,13 +236,11 @@
     const icons = {
       telegram: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 3L2 11.5L8 14L17 11L9 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
       youtube: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="1.3"/><path d="M10 9L16 12L10 15V9Z" fill="currentColor"/></svg>`,
-      // alternative chat-bubble icon instead of previous discord mark
       discord: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`
     };
 
     const grid = document.getElementById('linksGrid');
     profile.links.forEach(l => {
-      // for accessibility, use <a> for external links, <button> for actions (discord opens modal)
       let el;
       if(l.type === 'discord'){
         el = document.createElement('button');
@@ -231,10 +268,9 @@
     const partyBg = document.getElementById('partyBg');
     const partyG = document.getElementById('partyG');
     const colorBtn = document.getElementById('colorBtn');
-    let partyOn = false; // выключено по умолчанию
-    let partyColor = 'bw'; // 'bw' или 'color'
+    let partyOn = false;
+    let partyColor = 'bw';
 
-    // apply initial state
     partyBg.classList.toggle('active', partyOn);
     partyG.classList.remove('color','bw');
     partyG.classList.add(partyColor);
@@ -254,7 +290,6 @@
       colorBtn.textContent = (partyColor === 'bw') ? 'Включить цветной' : 'Включить ч/б';
     }
 
-    // gentler random flicker: longer interval, add short CSS animation class then remove
     setInterval(()=>{
       if(!partyOn) return;
       const cards = document.querySelectorAll('.link-card');
@@ -262,21 +297,32 @@
       const idx = Math.floor(Math.random()*cards.length);
       const c = cards[idx];
       c.classList.add('flicker');
-      // colored shadow only when color mode
       c.style.boxShadow = (partyColor === 'bw') ? '0 12px 30px rgba(255,255,255,0.06)' : '0 12px 30px rgba(124,58,237,0.12)';
       setTimeout(()=>{ c.classList.remove('flicker'); c.style.boxShadow=''; }, 450 + Math.random()*300);
     }, 1500);
 
     // modal
-    function openDiscordModal(link){
-      document.getElementById('modalTitle').textContent = 'Discord';
-      document.getElementById('dcUser').textContent = link.sub || 'discord';
-      document.getElementById('dcChannelBtn').href = link.url || '#';
-      document.getElementById('modalText').innerHTML = `discord username: <strong>${link.sub}</strong>`;
-      document.getElementById('modalBack').style.display = 'flex';
-    }
-    function closeModal(){document.getElementById('modalBack').style.display = 'none'}
-    document.getElementById('modalBack').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+   function openDiscordModal(link){
+  const modalBack = document.getElementById('modalBack');
+  if(!modalBack){
+    console.warn('modalBack not found — modal will not open');
+    return;
+  }
+
+  // ищем элементы, но не падаем если их нет
+  const modalTitle = document.getElementById('modalTitle');
+  const modalText  = document.getElementById('modalText');
+  const dcUserEl   = document.getElementById('dcUser');
+  const dcChannelBtn = document.getElementById('dcChannelBtn');
+
+  if(modalTitle) modalTitle.textContent = 'Discord';
+  if(dcUserEl) dcUserEl.textContent = (link && link.sub) ? link.sub : 'discord';
+  if(dcChannelBtn) dcChannelBtn.href = (link && link.url) ? link.url : '#';
+  if(modalText) modalText.innerHTML = `discord username: <strong>${(link && link.sub) ? link.sub : 'discord'}</strong>`;
+
+  // показываем модалку (вдруг стиль display управляется через класс — оставил прямую установку)
+  modalBack.style.display = 'flex';
+}
 
     // info modal (statuses)
     function openInfo(){ document.getElementById('infoBack').style.display = 'flex'; }
@@ -293,6 +339,8 @@
     // тг ссылки:
     document.getElementById('tgGroupBtn').href = 'https://t.me/+k1ZlAiUR26s3NWU8';
     document.getElementById('tgChannelBtn').href = 'https://t.me/cheetakha';
+    // обходы ограничений ссылка:
+    document.getElementById('bypassBtn').href = 'obhod.html';
 
     // --- countdown to birthday (22 July) ---
     function daysToBirthday(month = 7, day = 22){
@@ -308,13 +356,23 @@
       document.getElementById('daysToBday').textContent = days;
     }
     updateBday();
-    // обновлять раз в день
     setInterval(updateBday, 1000*60*60*6);
 
-    // small improvement: accessibility focus outline when keyboard nav used
+    // accessibility focus outline when keyboard nav used
     document.addEventListener('keydown', e => {
       if(e.key === 'Tab') document.body.classList.add('user-is-tabbing');
     });
+
+    // добавь в <script> (в той же области, где другие функции)
+window.closeModal = function() {
+  const modalBack = document.getElementById('modalBack');
+  if (modalBack) modalBack.style.display = 'none';
+};
+
+window.closeInfo = function() {
+  const infoBack = document.getElementById('infoBack');
+  if (infoBack) infoBack.style.display = 'none';
+};
 
   </script>
 </body>
