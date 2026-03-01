@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Обход ограничений</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1020;
+      --muted:#9aa4b2;
+      --accent1:#7c3aed;
+      --accent2:#06b6d4;
+      --border: rgba(255,255,255,0.08);
+      --card-elev: 0 10px 30px rgba(2,6,23,0.6);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#05060a 0%, #0b1020 100%);
+      color:#e9eef8;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      overflow:auto;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* PARTY BACKGROUND */
+    .party-bg{position:fixed;inset:0;z-index:0;opacity:0;pointer-events:none;transition:opacity .4s ease}
+    .party-bg.active{opacity:1}
+    .party-bg .g{position:absolute;inset:0;background-size:600% 600%;animation:gradientShift 18s linear infinite;filter:blur(40px);transition:filter .4s ease,opacity .4s ease,animation-duration .2s linear}
+    .party-bg .g.color{background:linear-gradient(270deg,#ff4d6d,#7c3aed,#06b6d4,#ffd86b);mix-blend-mode:normal;filter:blur(56px) saturate(130%);opacity:1;animation-duration:12s}
+    .party-bg .g.bw{background:linear-gradient(270deg,#0b0b0b,#444444,#ffffff,#bfbfbf);mix-blend-mode:screen;filter:blur(36px) saturate(75%);opacity:0.45;animation-duration:34s}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    .wrap{position:relative;z-index:5;width:100%;max-width:960px;padding:8px}
+
+    /* GLASS panelling */
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      box-shadow: var(--card-elev);
+    }
+
+    .card-shell{padding:22px;border-radius:16px}
+    .header{display:flex;gap:16px;align-items:center}
+    .title{font-weight:800;margin:0;font-size:22px}
+    .subtitle{color:var(--muted);margin-top:6px;font-size:13px}
+
+    .controls{display:flex;gap:8px;align-items:center;margin-left:auto}
+    .toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer}
+
+    .content{margin-top:18px;display:grid;grid-template-columns:1fr;gap:14px}
+    .section{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(6px)}
+    .section h2{margin:0 0 8px 0}
+    .note{color:var(--muted);font-size:14px}
+
+    .footer{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
+
+    @media (max-width:520px){.title{font-size:18px}.card-shell{padding:16px}}
+  </style>
+</head>
+<body>
+  <div class="party-bg" id="partyBg" aria-hidden>
+    <div class="g bw" id="partyG"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="card-shell glass">
+      <div class="header">
+        <div>
+          <h1 class="title">Обход ограничений</h1>
+          <div class="subtitle">страница без внешних ссылок — только информация</div>
+        </div>
+
+        <div class="controls" aria-hidden>
+          <button id="partyBtn" class="toggle" type="button" onclick="toggleParty()">Пати: Выкл</button>
+          <button id="colorBtn" class="toggle" type="button" onclick="togglePartyColor()">Включить цветной</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>ВПНы:</h2>
+          <p class="note"><a href="https://t.me/VPNCosmobot?start=ref_KZZEYKXI" target="_blank" rel="noopener">CosmoVPN</a>, есть бесплатная и платная версия(в платной имеется выбор регионов).</p>
+          <p class="note"><a href="https://t.me/hitvpnbot?start=1502879281238349" target="_blank" rel="noopener">HitVPN</a>, только платная версия, выбор регионов отсутствует.</p>
+          <p class="note">Proton VPN, и платно и бесплатно, но нестабилен. Возникнут проблемы с подключением. SoftEther VPN(только на ПК), при заходе на сайт необходим впн. Бесплатно, но нестабильно.</p>
+        </div>
+
+        <div class="section">
+          <h2>Прокси для телеграмм:</h2>
+          <p class="note">@NimarkoTGWorkBot, телеграмм бот выдающий прокси(вы должны быть подписаны на канал спонсора чтобы получить доступ к прокси. Может не работать).
+            Также можете использовать <a href="links.html" target="_blank" rel="noopener">этот прокси.</a> Соединение стабильное.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>Программы:</h2>
+          <p class="note"><a href="zapret.zip" target="_blank" rel="noopener">zapret</a>, уже подготовленны ссылки. </p>
+        </div>
+      </div>
+
+      <div class="footer">© 2026 waveliy</div>
+    </div>
+  </div>
+
+  <script>
+    // фоновая "пати" логика — точно такая же, как на основной странице
+    const partyBg = document.getElementById('partyBg');
+    const partyG = document.getElementById('partyG');
+    const partyBtn = document.getElementById('partyBtn');
+    const colorBtn = document.getElementById('colorBtn');
+
+    let partyOn = false;
+    let partyColor = 'bw';
+
+    function applyPartyState(){
+      partyBg.classList.toggle('active', partyOn);
+      partyG.classList.remove('color','bw');
+      partyG.classList.add(partyColor);
+      partyBtn.textContent = partyOn ? 'Пати: Вкл' : 'Пати: Выкл';
+      colorBtn.textContent = (partyColor === 'bw') ? 'Включить цветной' : 'Включить ч/б';
+    }
+
+    function toggleParty(){
+      partyOn = !partyOn;
+      applyPartyState();
+    }
+
+    function togglePartyColor(){
+      partyColor = (partyColor === 'bw') ? 'color' : 'bw';
+      applyPartyState();
+    }
+
+    applyPartyState();
+
+    // мягкая рандомная "вспышка" для карточек — здесь просто создаём похожий эффект на весь контейнер
+    setInterval(()=>{
+      if(!partyOn) return;
+      const wrap = document.querySelector('.card-shell');
+      if(!wrap) return;
+      wrap.classList.add('flicker');
+      setTimeout(()=> wrap.classList.remove('flicker'), 450 + Math.random()*300);
+    }, 1500);
+
+    // flicker animation (вставлено через JS класс)
+    (function addFlickerStyle(){
+      const css = `@keyframes pulseUp{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.02)}100%{transform:translateY(0) scale(1)}} .flicker{animation:pulseUp .35s ease forwards}`;
+      const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
