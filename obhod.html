@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
   <title>Обход ограничений</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,10 +26,13 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:32px;
+      padding:24px;
       overflow:auto;
+      line-height:1.5;
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      -webkit-text-size-adjust: 100%;
     }
 
     /* PARTY BACKGROUND */
@@ -52,22 +55,119 @@
       box-shadow: var(--card-elev);
     }
 
-    .card-shell{padding:22px;border-radius:16px}
-    .header{display:flex;gap:16px;align-items:center}
+    .card-shell{padding:22px;border-radius:16px;position:relative;overflow:visible}
+    .header{display:flex;gap:12px;align-items:center}
     .title{font-weight:800;margin:0;font-size:22px}
     .subtitle{color:var(--muted);margin-top:6px;font-size:13px}
 
     .controls{display:flex;gap:8px;align-items:center;margin-left:auto}
-    .toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer}
+    .toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px;border-radius:10px;cursor:pointer;min-height:40px;touch-action:manipulation}
 
     .content{margin-top:18px;display:grid;grid-template-columns:1fr;gap:14px}
     .section{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(6px)}
     .section h2{margin:0 0 8px 0}
     .note{color:var(--muted);font-size:14px}
 
-    .footer{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
+    .footer{margin-top:12px;color:var(--muted);font-size:12px;text-align:center;padding-bottom:12px}
 
-    @media (max-width:520px){.title{font-size:18px}.card-shell{padding:16px}}
+    /* Поддержать проект - плавающая кнопка */
+    .support-btn{
+      position:absolute;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      z-index:30;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      font-weight:700;
+      text-decoration:none;
+      color:#e9eef8;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      min-height:44px;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .support-btn:active{transform:translateX(-50%) scale(.98)}
+
+    /* Responsive tweaks */
+    @media (max-width:720px){
+      body{padding:14px}
+      .wrap{max-width:720px}
+      .card-shell{padding:16px}
+      .title{font-size:18px}
+      .subtitle{font-size:12px}
+      .toggle{padding:8px 10px;font-size:13px;min-height:40px}
+      .section{padding:14px}
+      .support-btn{padding:12px 16px;bottom:14px}
+
+      /* reduce heavy blur on small devices for perf */
+      .party-bg .g.color{filter:blur(28px) saturate(120%)}
+      .party-bg .g.bw{filter:blur(20px) saturate(70%)}
+
+      /* ensure content not hidden behind button */
+      .footer{padding-bottom:70px}
+    }
+
+    @media (max-width:420px){
+      .title{font-size:16px}
+      .support-btn{padding:12px 14px;font-size:14px;bottom:12px}
+      .controls{gap:6px}
+      .header{gap:8px;align-items:flex-start}
+      .subtitle{margin-top:4px}
+      .footer{padding-bottom:65px}
+    }
+
+    @media (max-width:360px){
+      body{padding:10px}
+      .card-shell{padding:12px}
+      .title{font-size:14px}
+      .subtitle{font-size:11px}
+      .toggle{padding:6px 8px;font-size:12px;min-height:36px}
+      .section{padding:10px}
+      .section h2{font-size:16px}
+      .note{font-size:13px}
+      .support-btn{padding:10px 12px;font-size:12px;bottom:10px}
+      .footer{padding-bottom:60px;font-size:11px}
+      .controls{gap:4px}
+      .header{gap:6px}
+    }
+
+    @media (max-width:320px){
+      body{padding:8px}
+      .card-shell{padding:10px}
+      .title{font-size:13px}
+      .subtitle{font-size:10px}
+      .toggle{padding:5px 7px;font-size:11px;min-height:32px}
+      .section{padding:8px}
+      .section h2{font-size:15px}
+      .note{font-size:12px}
+      .support-btn{padding:8px 10px;font-size:11px;bottom:8px;min-height:40px}
+      .footer{padding-bottom:50px;font-size:10px}
+      .controls{gap:3px}
+      .header{gap:5px}
+    }
+
+    @media (orientation: landscape) and (max-height: 500px){
+      body{padding:10px}
+      .card-shell{padding:12px}
+      .title{font-size:16px}
+      .subtitle{font-size:12px}
+      .section{padding:12px}
+      .support-btn{bottom:8px;padding:10px 14px}
+      .footer{padding-bottom:45px}
+    }
+
+    /* make links wrap nicely */
+    a{word-break:break-word}
+
   </style>
 </head>
 <body>
@@ -100,7 +200,7 @@
         <div class="section">
           <h2>Прокси для телеграмм:</h2>
           <p class="note">@NimarkoTGWorkBot, телеграмм бот выдающий прокси(вы должны быть подписаны на канал спонсора чтобы получить доступ к прокси. Может не работать).
-            Также можете использовать <a href="links.html" target="_blank" rel="noopener">этот прокси.</a> Соединение стабильное.
+            Также можете использовать <a href="links.html" target="_blank" rel="noopener">этот прокси.</a> Соединение стабильное. При использовании впн могут возникать проблемы с подключением к прокси, поскольку сервисы будут конфликтовать.
           </p>
         </div>
 
@@ -110,7 +210,10 @@
         </div>
       </div>
 
-      <div class="footer">© 2026 waveliy</div>
+      <!-- Плавающая кнопка поддержки -->
+      <a class="support-btn" href="https://yoomoney.ru/transfer/quickpay?requestId=353635373339393936305f62393861653636323334323938313030343462376337396666373137343565333934326236303861" target="_blank" rel="noopener noreferrer" aria-label="Поддержать проект">Поддержать проект</a>
+
+      <div class="footer">        </div>
     </div>
   </div>
 
@@ -145,19 +248,32 @@
     applyPartyState();
 
     // мягкая рандомная "вспышка" для карточек — здесь просто создаём похожий эффект на весь контейнер
+    const flickerInterval = 'ontouchstart' in window ? 3000 : 1500; // реже на мобильных
     setInterval(()=>{
       if(!partyOn) return;
       const wrap = document.querySelector('.card-shell');
       if(!wrap) return;
       wrap.classList.add('flicker');
       setTimeout(()=> wrap.classList.remove('flicker'), 450 + Math.random()*300);
-    }, 1500);
+    }, flickerInterval);
 
     // flicker animation (вставлено через JS класс)
     (function addFlickerStyle(){
       const css = `@keyframes pulseUp{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.02)}100%{transform:translateY(0) scale(1)}} .flicker{animation:pulseUp .35s ease forwards}`;
       const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
     })();
+
+    // simple enhancement: if viewport height is small, lift button a bit to avoid keyboard on mobile
+    function adjustForViewport(){
+      const btn = document.querySelector('.support-btn');
+      if(!btn) return;
+      const vh = window.innerHeight;
+      if(vh < 560) btn.style.bottom = '10px';
+      else btn.style.bottom = '';
+    }
+    window.addEventListener('resize', adjustForViewport);
+    window.addEventListener('orientationchange', adjustForViewport);
+    adjustForViewport();
   </script>
 </body>
 </html>
